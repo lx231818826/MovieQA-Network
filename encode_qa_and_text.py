@@ -171,6 +171,7 @@ def encode_documents(document_type, desc, model):
 def encode_qa(desc, model):
     """Encode question and answer using the descriptor.
     """
+    # change the first entry below to either train test or val for different splits
     _, QA = mqa.get_story_qa_data('test', 'subtitle')
     check_save_directory(filename=utils.QA_DESC_TEMPLATE %(desc, ''))
 
@@ -187,12 +188,15 @@ def encode_qa(desc, model):
         # encode sentences, and save features
         q_features = encode_sentences(desc, question_list, model, imdb_key=qa.imdb_key, is_qa=True)
         a_features = encode_sentences(desc, answer_list, model, imdb_key=qa.imdb_key, is_qa=True)
+        
+        # uncomment the line below to save questions features into np files
         # np.save(npy_fname, q_features)
+        
+        # save the file into model folder
         h5temp = h5py.File('models/test/%s.h5' % qa.imdb_key,'w')
         h5temp.create_dataset('answers/%s' % qa.qid, data = a_features)
         h5temp.create_dataset('question/%s' % qa.qid, data = q_features)
         
-        #h5temp.create('imdb_key', data = qa.imdb_key)
         h5temp.create_dataset('qa_indices', data = qa.qid)
         #h5temp.create('')
         h5temp.close()
